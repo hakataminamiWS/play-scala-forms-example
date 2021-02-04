@@ -1,5 +1,11 @@
 logs
 project/project
 project/target
+project/.bloop
+project/metals.sbt
 target
+.bloop
+.metals
+.vscode
 tmp
+.env
