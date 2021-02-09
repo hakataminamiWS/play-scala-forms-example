@@ -1,43 +1,53 @@
 @(widgets: Seq[Widget], form: Form[WidgetForm.Data], postUrl: Call)(implicit request: MessagesRequestHeader)
 
-  @main("Widgets") {
+@import scala.collection.immutable.ListMap
 
-    <h1>Widgets</h1>
+@main("Widgets") {
 
-    @* Flash shows updates to a page *@
-    @request.flash.data.map{ case (name, value) =>
-      <div>@name: @value</div>
-    }
+<h1>Widgets</h1>
 
-    <table>
-      <thead>
-        <tr><th>Name</th><th>Price</th>
-      </thead>
-      <tbody>
-      @for(w <- widgets) {
-        <tr><td>@w.name</td><td>@w.price</td></tr>
+@* Flash shows updates to a page *@
+@request.flash.data.map{ case (name, value) =>
+<div>@name: @value</div>
+}
+
+<table>
+  <thead>
+    <tr>
+      <th>都道府県</th>
+      <th>Price</th>
+  </thead>
+  <tbody>
+    @for(w <- widgets) { <tr>
+      <td>@views.Prefecture.allPrefecture(w.prefecture)</td>
+      <td>@w.price</td>
+      </tr>
       }
-      </tbody>
-    </table>
+  </tbody>
+</table>
 
-    <hr/>
+<hr />
 
-    @* Global errors are not tied to any particular form field *@
-    @if(form.hasGlobalErrors) {
-      @form.globalErrors.map { error: FormError =>
-        <div>
-          @error.key: @error.message
-        </div>
-      }
-    }
+@* Global errors are not tied to any particular form field *@
+@if(form.hasGlobalErrors) {
+@form.globalErrors.map { error: FormError =>
+<div>
+  @error.key: @error.message
+</div>
+}
+}
 
-    @helper.form(postUrl) {
-      @helper.CSRF.formField
+@helper.form(postUrl) {
+@helper.CSRF.formField
 
-      @helper.inputText(form("name"))
+@{
+helper.select(
+form("prefecture"),
+options = helper.options(views.Prefecture.allPrefecture)
+)}
 
-      @helper.inputText(form("price"))
+@helper.inputText(form("price"), Symbol("_showConstraints") -> false)
 
-      <button>Create widget</button>
-    }
-  }
+<button>Create widget</button>
+}
+}

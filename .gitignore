@@ -9,3 +9,4 @@ target
 .vscode
 tmp
 .env
+.scalafmt.conf

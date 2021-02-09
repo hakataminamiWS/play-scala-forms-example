@@ -32,7 +32,7 @@ class FunctionalSpec extends PlaySpec with GuiceOneAppPerSuite with Injecting wi
 
       // Call using the FakeRequest and the correct body information and CSRF token
       val request = FakeRequest(routes.WidgetController.createWidget())
-        .withFormUrlEncodedBody("name" -> "foo", "price" -> "100")
+        .withFormUrlEncodedBody("prefecture" -> "GIFU", "price" -> "100")
         .withCSRFToken
       val futureResult: Future[Result] = controller.createWidget().apply(request)
 
@@ -47,7 +47,7 @@ class FunctionalSpec extends PlaySpec with GuiceOneAppPerSuite with Injecting wi
 
       // Call the controller with negative price...
       val request = FakeRequest(routes.WidgetController.createWidget())
-        .withFormUrlEncodedBody("name" -> "foo", "price" -> "-100")
+        .withFormUrlEncodedBody("prefecture" -> "GIFU", "price" -> "-100")
         .withCSRFToken
       val futureResult: Future[Result] = controller.createWidget().apply(request)
 

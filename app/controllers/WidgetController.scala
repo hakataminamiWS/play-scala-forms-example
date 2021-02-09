@@ -9,23 +9,23 @@ import play.api.mvc._
 
 import scala.collection._
 
-/**
- * The classic WidgetController using MessagesAbstractController.
- *
- * Instead of MessagesAbstractController, you can use the I18nSupport trait,
- * which provides implicits that create a Messages instance from a request
- * using implicit conversion.
- *
- * See https://www.playframework.com/documentation/2.8.x/ScalaForms#passing-messagesprovider-to-form-helpers
- * for details.
- */
-class WidgetController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) {
+/** The classic WidgetController using MessagesAbstractController.
+  *
+  * Instead of MessagesAbstractController, you can use the I18nSupport trait,
+  * which provides implicits that create a Messages instance from a request
+  * using implicit conversion.
+  *
+  * See https://www.playframework.com/documentation/2.8.x/ScalaForms#passing-messagesprovider-to-form-helpers
+  * for details.
+  */
+class WidgetController @Inject() (cc: MessagesControllerComponents)
+    extends MessagesAbstractController(cc) {
   import WidgetForm._
 
-  private val widgets = mutable.ArrayBuffer(
-    Widget("Widget 1", 123),
-    Widget("Widget 2", 456),
-    Widget("Widget 3", 789)
+  private var widgets = mutable.ArrayBuffer(
+    Widget("FUKUOKA", 123),
+    Widget("KUMAMOTO", 456),
+    Widget("KAGOSHIMA", 789)
   )
 
   // The URL to the widget.  You can call this directly from the template, but it
@@ -53,9 +53,12 @@ class WidgetController @Inject()(cc: MessagesControllerComponents) extends Messa
 
     val successFunction = { data: Data =>
       // This is the good case, where the form was successfully parsed as a Data object.
-      val widget = Widget(name = data.name, price = data.price)
+      val widget = Widget(prefecture = data.prefecture, price = data.price)
       widgets += widget
-      Redirect(routes.WidgetController.listWidgets()).flashing("info" -> "Widget added!")
+      // 表示数を制限するため、投稿されたもののうち最新の10 のみ保持
+      while (widgets.size > 10) { widgets = widgets.tail }
+      Redirect(routes.WidgetController.listWidgets())
+        .flashing("info" -> "Widget added!")
     }
 
     val formValidationResult = form.bindFromRequest

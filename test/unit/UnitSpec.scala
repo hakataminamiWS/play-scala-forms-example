@@ -20,31 +20,31 @@ class UnitSpec extends PlaySpec {
     "apply successfully from request" in {
       // The easiest way to test a form is by passing it a fake request.
       val call = controllers.routes.WidgetController.createWidget()
-      implicit val request: Request[_] = FakeRequest(call).withFormUrlEncodedBody("name" -> "foo", "price" -> "100")
+      implicit val request: Request[_] = FakeRequest(call).withFormUrlEncodedBody("prefecture" -> "GIFU", "price" -> "100")
       // A successful binding using an implicit request will give you a form with a value.
       val boundForm = WidgetForm.form.bindFromRequest()
       // You can then get the widget data out and test it.
       val widgetData = boundForm.value.get
 
-      widgetData.name must equal("foo")
+      widgetData.prefecture must equal("GIFU")
       widgetData.price must equal(100)
     }
 
     "apply successfully from map" in {
       // You can also bind directy from a map, if you don't have a request handy.
-      val data = Map("name" -> "foo", "price" -> "100")
+      val data = Map("prefecture" -> "GIFU", "price" -> "100")
       // A successful binding will give you a form with a value.
       val boundForm = WidgetForm.form.bind(data)
       // You can then get the widget data out and test it.
       val widgetData = boundForm.value.get
 
-      widgetData.name must equal("foo")
+      widgetData.prefecture must equal("GIFU")
       widgetData.price must equal(100)
     }
 
     "show errors when applied unsuccessfully" in {
       // Pass in a negative price that fails the constraints...
-      val data = Map("name" -> "foo", "price" -> "-100")
+      val data = Map("prefecture" -> "GIFU", "price" -> "-100")
 
       // ...and binding the form will show errors.
       val errorForm = WidgetForm.form.bind(data)
