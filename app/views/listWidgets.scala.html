@@ -19,7 +19,9 @@
   </thead>
   <tbody>
     @for(w <- widgets) { <tr>
-      <td>@views.Prefecture.allPrefecture(w.prefecture)</td>
+      <td>@{
+        if (controllers.Prefecture.allPrefecture.contains(w.prefecture)) controllers.Prefecture.allPrefecture(w.prefecture) else "none"
+        }</td>
       <td>@w.price</td>
       </tr>
       }
@@ -43,7 +45,7 @@
 @{
 helper.select(
 form("prefecture"),
-options = helper.options(views.Prefecture.allPrefecture)
+options = helper.options(controllers.Prefecture.allPrefecture)
 )}
 
 @helper.inputText(form("price"), Symbol("_showConstraints") -> false)
