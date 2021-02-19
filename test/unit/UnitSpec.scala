@@ -7,11 +7,10 @@ import play.api.i18n._
 import play.api.mvc._
 import play.api.test._
 
-/**
- * Unit tests that do not require a running Play application.
- *
- * This is useful for testing forms and constraints.
- */
+/** Unit tests that do not require a running Play application.
+  *
+  * This is useful for testing forms and constraints.
+  */
 class UnitSpec extends PlaySpec {
   import play.api.data.FormBinding.Implicits._
 
@@ -20,7 +19,8 @@ class UnitSpec extends PlaySpec {
     "apply successfully from request" in {
       // The easiest way to test a form is by passing it a fake request.
       val call = controllers.routes.WidgetController.createWidget()
-      implicit val request: Request[_] = FakeRequest(call).withFormUrlEncodedBody("prefecture" -> "GIFU", "price" -> "100")
+      implicit val request: Request[_] = FakeRequest(call)
+        .withFormUrlEncodedBody("prefecture" -> "GIFU", "price" -> "100")
       // A successful binding using an implicit request will give you a form with a value.
       val boundForm = WidgetForm.form.bindFromRequest()
       // You can then get the widget data out and test it.
@@ -42,7 +42,7 @@ class UnitSpec extends PlaySpec {
       widgetData.price must equal(100)
     }
 
-    "show errors when applied unsuccessfully" in {
+    "show errors when applied a negative price" in {
       // Pass in a negative price that fails the constraints...
       val data = Map("prefecture" -> "GIFU", "price" -> "-100")
 
@@ -78,15 +78,31 @@ class UnitSpec extends PlaySpec {
       // app.inject[MessagesApi] and messageApi.preferred(request), but we can
       // do it by hand here just to demonstrate what happens underneath the hood:
       val lang: Lang = Lang.defaultLang
-      val messagesApi: MessagesApi = new DefaultMessagesApi(Map(lang.code -> Map("error.min" -> "Must be greater or equal to {0}")))
+      val messagesApi: MessagesApi = new DefaultMessagesApi(
+        Map(lang.code -> Map("error.min" -> "Must be greater or equal to {0}"))
+      )
       val messagesProvider: MessagesProvider = messagesApi.preferred(Seq(lang))
-      val message: String = Messages(formError.message, formError.args: _*)(messagesProvider)
+      val message: String =
+        Messages(formError.message, formError.args: _*)(messagesProvider)
 
       // And the message will be run through with the arguments:
       message must equal("Must be greater or equal to 0")
     }
 
+    "show errors when applied a non-exist key at prefecture field" in {
+      // Pass in a non-exist key at prefecure field that fails the constraints...
+      val call = controllers.routes.WidgetController.createWidget()
+      implicit val request: Request[_] = FakeRequest(call)
+        .withFormUrlEncodedBody("prefecture" -> "XXX", "price" -> "100")
+
+      val errorForm = WidgetForm.form.bindFromRequest()
+
+      val listOfErrors = errorForm.errors
+
+      val formError: FormError = listOfErrors.head
+      formError.key must equal("prefecture")
+      errorForm.hasGlobalErrors mustBe false
+      formError.message must equal("error.prefecture")
+    }
   }
-
-
 }
