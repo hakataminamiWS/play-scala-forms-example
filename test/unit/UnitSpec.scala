@@ -104,5 +104,19 @@ class UnitSpec extends PlaySpec {
       errorForm.hasGlobalErrors mustBe false
       formError.message must equal("error.prefecture")
     }
+
+    "show errors when applied a non-number value" in {
+      val data = Map("prefecture" -> "GIFU", "price" -> "abc")
+
+      val errorForm = WidgetForm.form.bind(data)
+      val listOfErrors = errorForm.errors
+
+      val formError: FormError = listOfErrors.head
+      formError.key must equal("price")
+
+      errorForm.hasGlobalErrors mustBe false
+
+      formError.message must equal("error.number")
+    }
   }
 }

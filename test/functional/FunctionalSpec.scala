@@ -11,14 +11,17 @@ import play.api.test._
 
 import scala.concurrent.Future
 
-/**
- * Functional specification that has a running Play application.
- *
- * This is good for testing filter functionality, such as CSRF token and template checks.
- *
- * See https://www.playframework.com/documentation/2.8.x/ScalaFunctionalTestingWithScalaTest for more details.
- */
-class FunctionalSpec extends PlaySpec with GuiceOneAppPerSuite with Injecting with ScalaFutures {
+/** Functional specification that has a running Play application.
+  *
+  * This is good for testing filter functionality, such as CSRF token and template checks.
+  *
+  * See https://www.playframework.com/documentation/2.8.x/ScalaFunctionalTestingWithScalaTest for more details.
+  */
+class FunctionalSpec
+    extends PlaySpec
+    with GuiceOneAppPerSuite
+    with Injecting
+    with ScalaFutures {
 
   // CSRF token helper adds "withCSRFToken" to FakeRequest:
   // https://www.playframework.com/documentation/2.8.x/ScalaCsrf#Testing-CSRF
@@ -34,11 +37,14 @@ class FunctionalSpec extends PlaySpec with GuiceOneAppPerSuite with Injecting wi
       val request = FakeRequest(routes.WidgetController.createWidget())
         .withFormUrlEncodedBody("prefecture" -> "GIFU", "price" -> "100")
         .withCSRFToken
-      val futureResult: Future[Result] = controller.createWidget().apply(request)
+      val futureResult: Future[Result] =
+        controller.createWidget().apply(request)
 
       // And we can get the results out using Scalatest's "Futures" trait, which gives us whenReady
       whenReady(futureResult) { result =>
-        result.header.headers(LOCATION) must equal(routes.WidgetController.listWidgets().url)
+        result.header.headers(LOCATION) must equal(
+          routes.WidgetController.listWidgets().url
+        )
       }
     }
 
@@ -49,10 +55,28 @@ class FunctionalSpec extends PlaySpec with GuiceOneAppPerSuite with Injecting wi
       val request = FakeRequest(routes.WidgetController.createWidget())
         .withFormUrlEncodedBody("prefecture" -> "GIFU", "price" -> "-100")
         .withCSRFToken
-      val futureResult: Future[Result] = controller.createWidget().apply(request)
+      val futureResult: Future[Result] =
+        controller.createWidget().apply(request)
 
       status(futureResult) must be(Status.BAD_REQUEST)
     }
   }
 
+// Testing Messages API(https://www.playframework.com/documentation/2.8.x/ScalaFunctionalTestingWithSpecs2#Testing-Messages-API)
+  "Messages" must {
+    import play.api.i18n._
+    implicit val lang = Lang("ja")
+
+    "provide japanese messages with the Scala API" in {
+      val messagesApi = inject[MessagesApi]
+      val msgMap = Map(
+        "error.min" -> "正の値を入れてください。",
+        "error.number" -> "数字を入れてください。"
+      )
+
+      msgMap.foreachEntry((msgkey, msgtext) =>
+        messagesApi(msgkey) must be(msgtext)
+      )
+    }
+  }
 }
