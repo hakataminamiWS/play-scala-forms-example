@@ -25,3 +25,6 @@ Originally written by Chris Birchall and the Guardian Team: <https://github.com/
 
 [都道府県のselect に入力値チェックを追加 #3](https://github.com/hakataminamiWS/play-scala-forms-example/issues/3)
 -> [こちらのぶろぐ](https://hakataminamiwebservice.hatenablog.com/entry/2021/02/22/145926)
+
+[price にマイナスを入れたときのメッセージを日本語に #5](https://github.com/hakataminamiWS/play-scala-forms-example/issues/5)
+-> [こちらのぶろぐ](https://hakataminamiwebservice.hatenablog.com/entry/2021/03/17/161948)
